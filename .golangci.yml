@@ -1,0 +1,192 @@
+# This file contains all available configuration options with their default values.
+# https://github.com/golangci/golangci-lint/blob/master/.golangci.example.yml
+
+run:
+  skip-dirs:
+    - vendor
+    - .go-make
+
+linters-settings:
+  govet:
+    # report about shadowed variables, it happens a lot unintentionally 
+    check-shadowing: true
+
+  goimports:
+    # put imports beginning with prefix after 3rd-party packages;
+    # it's a comma-separated list of prefixes
+    # local-prefixes:
+
+  gocyclo:
+    # minimal code complexity to report, 30 by default (but we recommend 10-20)
+    # let's not make spaghetti, 15 is between 10 and 20
+    min-complexity: 15
+
+  dupl:
+    # tokens count to trigger issue, 150 by default
+    threshold: 100
+
+  goconst:
+    # any string repeated at least once should be const
+    min-len: 1
+    min-occurrences: 2
+
+  lll:
+    # max line length, lines longer will be reported. Default is 120.
+    # '\t' is counted as 1 character by default, and can be changed with the tab-width option
+    line-length: 140
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+
+    disabled-checks:
+      - dupImport # https://github.com/go-critic/go-critic/issues/845
+      - ifElseChain
+      - octalLiteral
+      - whyNoLint
+      - wrapperFunc
+
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - deadcode
+    - dogsled
+    - dupl
+    - errcheck
+    - exhaustive
+    - funlen
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - golint
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - interfacer
+    - lll
+    - misspell
+    - nakedret
+    - nolintlint
+    - rowserrcheck
+    - scopelint
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+    - whitespace
+
+  # Do not enable 
+
+  # Gocognit calculates cognitive complexities of functions in Go source code. 
+  # The same job does gocyclo and it has more stars on GitHub
+  # - gocognit 
+
+  # Maligned suggests structs optimisations for performance. I think we should 
+  # care about correctness and readability rather then performance, unless we 
+  # really have to optimise 
+  # - maligned
+
+  # This linter checks package imports are in a list of acceptable packages.
+  # I don't have any harmful pacakage in mind to blacklist, if anyone has we 
+  # can enable this later on ( although I don't mind blacklisting Gorm 😈 )
+  # - depguard
+
+  # Again, premature performance optimisation enforcment.. 
+  # - prealloc
+
+  # Checks that no globals are present in Go code. I don't like this once. I think it is
+  # against the philosophy of Go packages. Package encapsulates all the complexity and
+  # provides contract for users. As long as contract is working and global variables
+  # are not exported it should be fine.
+  # - gochecknoglobals 
+
+  # Linter that checks if all top-level comments contain a period at the end of the last sentence. 🤯🙅‍♂️
+  # - godot 
+
+  # unknown... 
+  # - godox
+
+  # Golang linter to check the errors handling expressions. The idea is to make error checking complice 
+  # with Go 1.13 error type behaviour changed but the build fails on GitHub for this project and it 
+  # looks dodgy.
+  # - err113
+
+  # Reports deeply nested if statements in Go code. Covered by gocyclo
+  # - nestif
+
+  # GCI, a tool that control golang package import order and make it always deterministic.
+  # This puts third party packages after local 😕
+  # - gci
+
+  # testpackage is a golang linter that makes you use a separate _test package. This is a good approach
+  # but could be annoying. All in all those are unit tests and sometimes you want to be able to unit test some 
+  # private functions as well.
+  # - testpackage 
+
+  # Enforces whitespacing. This linter is quiet aggressive.
+  # - wls
+
+  # This forces to use http.NewRequestWithContext instead of http.NewRequest, which is 
+  # not necessarily a bad thing, this is just an overkill, especially when we have existing
+  # code 
+  # -noctx
+
+issues:
+  # List of regexps of issue texts to exclude, empty list by default.
+  # But independently from this option we use default exclude patterns,
+  # it can be disabled by `exclude-use-default: false`. To list all
+  # excluded by default patterns execute `golangci-lint run --help`
+  exclude:
+    - unnecessary leading newline
+  # Excluding configuration per-path, per-linter, per-text and per-source
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+        - gochecknoinits
+        - gochecknoglobals
+
+    # Exclude lll issues for long lines with go:generate
+    - linters:
+        - lll
+      source: "^//go:generate"
+
+    - linters:
+        - errcheck
+      source: "^[ \t]*defer "
+
+  # Independently from option `exclude` we use default exclude patterns,
+  # it can be disabled by this option. To list all
+  # excluded by default patterns execute `golangci-lint run --help`.
+  # Default value for this option is true.
+  exclude-use-default: false
+
+  # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
+  max-same-issues: 0
+
+  # Show only new issues: if there are unstaged changes or untracked files,
+  # only those changes are analyzed, else only changes in HEAD~ are analyzed.
+  # It's a super-useful option for integration of golangci-lint into existing
+  # large codebase. It's not practical to fix all existing issues at the moment
+  # of integration: much better don't allow issues in new code.
+  # Default is false.
+  new: false
+
